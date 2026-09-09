@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module.js';
+import { PrismaService } from './../src/prisma/prisma.service.js';
 
 describe('App (e2e)', () => {
   let app: INestApplication<App>;
@@ -22,6 +23,10 @@ describe('App (e2e)', () => {
       .get('/api/v1/health')
       .expect(200)
       .expect({ status: 'ok' });
+  });
+
+  it('resolves PrismaService', () => {
+    expect(app.get(PrismaService)).toBeDefined();
   });
 
   afterEach(async () => {
