@@ -37,6 +37,19 @@ describe('App (e2e)', () => {
       });
   });
 
+  it('does not expose a Users HTTP route', () => {
+    return request(app.getHttpServer())
+      .get('/api/v1/users')
+      .expect(404)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({
+          statusCode: 404,
+          code: 'HTTP_ERROR',
+          error: 'Not Found',
+        });
+      });
+  });
+
   it('resolves PrismaService', () => {
     expect(app.get(PrismaService)).toBeDefined();
   });
