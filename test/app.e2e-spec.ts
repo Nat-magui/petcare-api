@@ -25,6 +25,18 @@ describe('App (e2e)', () => {
       .expect({ status: 'ok' });
   });
 
+  it('normalizes an unmatched route with HTTP_ERROR', () => {
+    return request(app.getHttpServer())
+      .get('/api/v1/no-existe')
+      .expect(404)
+      .expect({
+        statusCode: 404,
+        code: 'HTTP_ERROR',
+        error: 'Not Found',
+        message: 'Cannot GET /api/v1/no-existe',
+      });
+  });
+
   it('resolves PrismaService', () => {
     expect(app.get(PrismaService)).toBeDefined();
   });

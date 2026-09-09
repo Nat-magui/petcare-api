@@ -274,6 +274,8 @@ Referencia: `BR-VACC-001` a `BR-VACC-006`.
 - `register` y `login` tienen rate limit reforzado.
 - Errores inesperados no exponen stack traces ni detalles internos.
 - Los errores controlados usan `statusCode`, `code`, `error`, `message` y `details` opcional.
+- Los `HttpException` generados por el framework que no posean un código PetCare
+  específico usan `HTTP_ERROR`, conservando su status HTTP original.
 
 Referencia: `BR-SEC-001` a `BR-SEC-004`, `BR-DATA-001`, `BR-DATA-002`.
 
@@ -374,8 +376,17 @@ Contratos de sesión:
 
 - `VALIDATION_ERROR`
 - `INVALID_IDENTIFIER`
+- `HTTP_ERROR`
 - `RATE_LIMIT_EXCEEDED`
 - `INTERNAL_ERROR`
+
+`HTTP_ERROR` se utiliza como fallback para errores HTTP controlados generados por
+el framework cuando no existe un código PetCare más específico. Conserva el
+status HTTP original y el envelope estándar de la API.
+
+Ejemplo: una ruta inexistente puede responder `404 HTTP_ERROR`.
+
+`INTERNAL_ERROR` queda reservado para errores inesperados de servidor.
 
 **Auth / User**
 
