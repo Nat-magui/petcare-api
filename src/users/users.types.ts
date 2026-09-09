@@ -24,6 +24,15 @@ export type AuthUser = Prisma.UserGetPayload<{
   select: typeof authUserSelect;
 }>;
 
+export function toPublicUser(user: AuthUser): PublicUser {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+  };
+}
+
 export interface CreateUserData {
   name: string;
   email: string;

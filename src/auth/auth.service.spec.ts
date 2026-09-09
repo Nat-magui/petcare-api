@@ -1,4 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
+import type { JwtService } from '@nestjs/jwt';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppException } from '../common/errors/app.exception.js';
 import { ERROR_CODE } from '../common/errors/error-code.js';
@@ -37,7 +39,11 @@ describe('AuthService registration', () => {
     };
     hashMock.mockReset();
     hashMock.mockResolvedValue('bcrypt-password-hash');
-    service = new AuthService(usersService as unknown as UsersService);
+    service = new AuthService(
+      usersService as unknown as UsersService,
+      {} as JwtService,
+      {} as ConfigService,
+    );
   });
 
   it('hashes with cost 12 and persists no plaintext password', async () => {

@@ -3,4 +3,5 @@ export const ERROR_MESSAGE = {
   INVALID_IDENTIFIER: 'El identificador enviado no es válido.',
   INTERNAL_ERROR: 'Ocurrió un error interno. Intentá nuevamente más tarde.',
   AUTH_EMAIL_IN_USE: 'El correo electrónico ya está registrado.',
+  AUTH_INVALID_CREDENTIALS: 'Las credenciales son inválidas.',
 } as const;
