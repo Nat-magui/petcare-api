@@ -7,3 +7,74 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Species {
+  DOG
+  CAT
+  OTHER
+}
+
+enum CareMode {
+  FAMILY
+  FOSTER
+}
+
+enum PetAccessRole {
+  OWNER
+  CAREGIVER
+  VIEWER
+}
+
+model User {
+  id               String      @id @default(uuid()) @db.Uuid
+  name             String
+  email            String      @unique
+  passwordHash     String
+  refreshTokenHash String?
+  createdAt        DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime    @updatedAt @db.Timestamptz(3)
+  petAccesses      PetAccess[]
+}
+
+model Pet {
+  id                     String        @id @default(uuid()) @db.Uuid
+  name                   String
+  species                Species
+  breed                  String?
+  birthDate              DateTime?     @db.Date
+  careMode               CareMode
+  rescueOrganizationName String?
+  createdAt              DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime      @updatedAt @db.Timestamptz(3)
+  accesses               PetAccess[]
+  vaccinations           Vaccination[]
+}
+
+model PetAccess {
+  userId    String        @db.Uuid
+  petId     String        @db.Uuid
+  role      PetAccessRole
+  createdAt DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime      @updatedAt @db.Timestamptz(3)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pet       Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@id([userId, petId])
+  @@index([petId, role])
+}
+
+model Vaccination {
+  id               String    @id @default(uuid()) @db.Uuid
+  petId            String    @db.Uuid
+  vaccineName      String
+  appliedAt        DateTime  @db.Date
+  nextDueAt        DateTime? @db.Date
+  veterinarianName String?
+  clinicName       String?
+  notes            String?
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime  @updatedAt @db.Timestamptz(3)
+  pet              Pet       @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+}
