@@ -16,5 +16,6 @@ export const ERROR_MESSAGE = {
   PET_ACCESS_NOT_FOUND:
     'No se encontró el acceso solicitado para esta mascota.',
   PET_LAST_OWNER: 'La mascota debe conservar al menos un OWNER.',
+  VACCINATION_NOT_FOUND: 'No se encontró la vacunación solicitada.',
   VACCINATION_INVALID_DATES: 'Las fechas de vacunación no son válidas.',
 } as const;

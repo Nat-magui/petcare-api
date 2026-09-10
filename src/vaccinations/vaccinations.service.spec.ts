@@ -27,7 +27,13 @@ describe('VaccinationsService', () => {
   let prisma: {
     pet: { findUnique: ReturnType<typeof vi.fn> };
     petAccess: { findUnique: ReturnType<typeof vi.fn> };
-    vaccination: { create: ReturnType<typeof vi.fn> };
+    vaccination: {
+      create: ReturnType<typeof vi.fn>;
+      findMany: ReturnType<typeof vi.fn>;
+      findFirst: ReturnType<typeof vi.fn>;
+      update: ReturnType<typeof vi.fn>;
+      delete: ReturnType<typeof vi.fn>;
+    };
   };
   let service: VaccinationsService;
 
@@ -39,6 +45,10 @@ describe('VaccinationsService', () => {
       },
       vaccination: {
         create: vi.fn().mockResolvedValue(storedVaccination),
+        findMany: vi.fn().mockResolvedValue([storedVaccination]),
+        findFirst: vi.fn().mockResolvedValue(storedVaccination),
+        update: vi.fn().mockResolvedValue(storedVaccination),
+        delete: vi.fn().mockResolvedValue({ id: vaccinationId }),
       },
     };
     service = new VaccinationsService(prisma as unknown as PrismaService);
@@ -195,4 +205,147 @@ describe('VaccinationsService', () => {
       notes: null,
     });
   });
+
+  it.each([
+    PetAccessRole.OWNER,
+    PetAccessRole.CAREGIVER,
+    PetAccessRole.VIEWER,
+  ])('allows %s to list only vaccinations for the requested Pet', async (role) => {
+    prisma.petAccess.findUnique.mockResolvedValue({ role });
+
+    await expect(service.findAll(requesterId, petId)).resolves.toEqual([
+      {
+        ...storedVaccination,
+        appliedAt: '2026-09-01',
+        nextDueAt: '2027-09-01',
+      },
+    ]);
+    expect(prisma.vaccination.findMany).toHaveBeenCalledWith({
+      where: { petId },
+      select: expect.any(Object),
+    });
+  });
+
+  it('returns an empty vaccination list', async () => {
+    prisma.vaccination.findMany.mockResolvedValue([]);
+
+    await expect(service.findAll(requesterId, petId)).resolves.toEqual([]);
+  });
+
+  it('scopes vaccination detail by both vaccinationId and petId', async () => {
+    await expect(
+      service.findOne(requesterId, petId, vaccinationId),
+    ).resolves.toMatchObject({ id: vaccinationId, petId });
+    expect(prisma.vaccination.findFirst).toHaveBeenCalledWith({
+      where: { id: vaccinationId, petId },
+      select: expect.any(Object),
+    });
+  });
+
+  it('returns VACCINATION_NOT_FOUND for a missing or cross-Pet vaccination', async () => {
+    prisma.vaccination.findFirst.mockResolvedValue(null);
+
+    await expect(
+      service.findOne(requesterId, petId, vaccinationId),
+    ).rejects.toMatchObject({
+      response: {
+        code: ERROR_CODE.VACCINATION_NOT_FOUND,
+        message: ERROR_MESSAGE.VACCINATION_NOT_FOUND,
+      },
+    });
+  });
+
+  it('merges PATCH with persisted state and updates only supplied fields', async () => {
+    prisma.vaccination.update.mockResolvedValue({
+      ...storedVaccination,
+      vaccineName: 'Updated Rabies',
+      veterinarianName: null,
+    });
+
+    const result = await service.update(requesterId, petId, vaccinationId, {
+      vaccineName: 'Updated Rabies',
+      veterinarianName: null,
+    });
+
+    expect(prisma.vaccination.update).toHaveBeenCalledWith({
+      where: { id: vaccinationId },
+      data: { vaccineName: 'Updated Rabies', veterinarianName: null },
+      select: expect.any(Object),
+    });
+    expect(result).toMatchObject({
+      vaccineName: 'Updated Rabies',
+      appliedAt: '2026-09-01',
+      nextDueAt: '2027-09-01',
+      veterinarianName: null,
+    });
+  });
+
+  it('rejects an invalid final state caused by updating only appliedAt', async () => {
+    await expect(
+      service.update(requesterId, petId, vaccinationId, {
+        appliedAt: '2028-01-01',
+      }),
+    ).rejects.toMatchObject({
+      response: { code: ERROR_CODE.VACCINATION_INVALID_DATES },
+    });
+    expect(prisma.vaccination.update).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid final state caused by updating only nextDueAt', async () => {
+    await expect(
+      service.update(requesterId, petId, vaccinationId, {
+        nextDueAt: '2026-08-31',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        code: ERROR_CODE.VACCINATION_INVALID_DATES,
+        details: { field: 'nextDueAt' },
+      },
+    });
+    expect(prisma.vaccination.update).not.toHaveBeenCalled();
+  });
+
+  it('returns the current response without an empty Prisma update', async () => {
+    await expect(
+      service.update(requesterId, petId, vaccinationId, {}),
+    ).resolves.toMatchObject({ id: vaccinationId });
+    expect(prisma.vaccination.update).not.toHaveBeenCalled();
+  });
+
+  it('rejects VIEWER write operations before vaccination lookup', async () => {
+    prisma.petAccess.findUnique.mockResolvedValue({
+      role: PetAccessRole.VIEWER,
+    });
+
+    await expect(
+      service.update(requesterId, petId, vaccinationId, { notes: null }),
+    ).rejects.toMatchObject({
+      response: { code: ERROR_CODE.PET_ROLE_FORBIDDEN },
+    });
+    await expect(
+      service.delete(requesterId, petId, vaccinationId),
+    ).rejects.toMatchObject({
+      response: { code: ERROR_CODE.PET_ROLE_FORBIDDEN },
+    });
+    expect(prisma.vaccination.findFirst).not.toHaveBeenCalled();
+  });
+
+  it.each([PetAccessRole.OWNER, PetAccessRole.CAREGIVER])(
+    'allows %s to delete a scoped vaccination',
+    async (role) => {
+      prisma.petAccess.findUnique.mockResolvedValue({ role });
+
+      await expect(
+        service.delete(requesterId, petId, vaccinationId),
+      ).resolves.toBeUndefined();
+      expect(prisma.vaccination.findFirst).toHaveBeenCalledWith({
+        where: { id: vaccinationId, petId },
+        select: expect.any(Object),
+      });
+      expect(prisma.vaccination.delete).toHaveBeenCalledWith({
+        where: { id: vaccinationId },
+        select: { id: true },
+      });
+    },
+  );
 });

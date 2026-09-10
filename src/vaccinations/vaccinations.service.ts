@@ -9,6 +9,7 @@ import {
 } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateVaccinationDto } from './dto/create-vaccination.dto.js';
+import type { UpdateVaccinationDto } from './dto/update-vaccination.dto.js';
 import type { VaccinationResponse } from './vaccinations.types.js';
 
 const vaccinationSelect = {
@@ -47,7 +48,7 @@ export class VaccinationsService {
     petId: string,
     createVaccinationDto: CreateVaccinationDto,
   ): Promise<VaccinationResponse> {
-    await this.assertCanCreate(requesterId, petId);
+    await this.assertPetAccess(requesterId, petId, true);
 
     this.validateBusinessDates(
       createVaccinationDto.appliedAt,
@@ -73,9 +74,113 @@ export class VaccinationsService {
     return this.toVaccinationResponse(vaccination);
   }
 
-  private async assertCanCreate(
+  async findAll(
     requesterId: string,
     petId: string,
+  ): Promise<VaccinationResponse[]> {
+    await this.assertPetAccess(requesterId, petId, false);
+
+    const vaccinations = await this.prisma.vaccination.findMany({
+      where: { petId },
+      select: vaccinationSelect,
+    });
+
+    return vaccinations.map((vaccination) =>
+      this.toVaccinationResponse(vaccination),
+    );
+  }
+
+  async findOne(
+    requesterId: string,
+    petId: string,
+    vaccinationId: string,
+  ): Promise<VaccinationResponse> {
+    await this.assertPetAccess(requesterId, petId, false);
+    const vaccination = await this.findScopedVaccination(
+      petId,
+      vaccinationId,
+    );
+
+    return this.toVaccinationResponse(vaccination);
+  }
+
+  async update(
+    requesterId: string,
+    petId: string,
+    vaccinationId: string,
+    updateVaccinationDto: UpdateVaccinationDto,
+  ): Promise<VaccinationResponse> {
+    await this.assertPetAccess(requesterId, petId, true);
+    const vaccination = await this.findScopedVaccination(
+      petId,
+      vaccinationId,
+    );
+
+    const existingAppliedAt = this.toBusinessDate(vaccination.appliedAt);
+    const existingNextDueAt = vaccination.nextDueAt
+      ? this.toBusinessDate(vaccination.nextDueAt)
+      : null;
+    const finalAppliedAt = updateVaccinationDto.appliedAt ?? existingAppliedAt;
+    const finalNextDueAt =
+      updateVaccinationDto.nextDueAt === undefined
+        ? existingNextDueAt
+        : updateVaccinationDto.nextDueAt;
+
+    this.validateBusinessDates(finalAppliedAt, finalNextDueAt);
+
+    const data: Prisma.VaccinationUpdateInput = {};
+    if (updateVaccinationDto.vaccineName !== undefined) {
+      data.vaccineName = updateVaccinationDto.vaccineName;
+    }
+    if (updateVaccinationDto.appliedAt !== undefined) {
+      data.appliedAt = this.toDatabaseDate(updateVaccinationDto.appliedAt);
+    }
+    if (updateVaccinationDto.nextDueAt !== undefined) {
+      data.nextDueAt =
+        updateVaccinationDto.nextDueAt === null
+          ? null
+          : this.toDatabaseDate(updateVaccinationDto.nextDueAt);
+    }
+    if (updateVaccinationDto.veterinarianName !== undefined) {
+      data.veterinarianName = updateVaccinationDto.veterinarianName;
+    }
+    if (updateVaccinationDto.clinicName !== undefined) {
+      data.clinicName = updateVaccinationDto.clinicName;
+    }
+    if (updateVaccinationDto.notes !== undefined) {
+      data.notes = updateVaccinationDto.notes;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return this.toVaccinationResponse(vaccination);
+    }
+
+    const updatedVaccination = await this.prisma.vaccination.update({
+      where: { id: vaccinationId },
+      data,
+      select: vaccinationSelect,
+    });
+
+    return this.toVaccinationResponse(updatedVaccination);
+  }
+
+  async delete(
+    requesterId: string,
+    petId: string,
+    vaccinationId: string,
+  ): Promise<void> {
+    await this.assertPetAccess(requesterId, petId, true);
+    await this.findScopedVaccination(petId, vaccinationId);
+    await this.prisma.vaccination.delete({
+      where: { id: vaccinationId },
+      select: { id: true },
+    });
+  }
+
+  private async assertPetAccess(
+    requesterId: string,
+    petId: string,
+    writeRequired: boolean,
   ): Promise<void> {
     const pet = await this.prisma.pet.findUnique({
       where: { id: petId },
@@ -108,13 +213,33 @@ export class VaccinationsService {
       });
     }
 
-    if (requesterAccess.role === PetAccessRole.VIEWER) {
+    if (writeRequired && requesterAccess.role === PetAccessRole.VIEWER) {
       throw new AppException({
         statusCode: HttpStatus.FORBIDDEN,
         code: ERROR_CODE.PET_ROLE_FORBIDDEN,
         message: ERROR_MESSAGE.PET_ROLE_FORBIDDEN,
       });
     }
+  }
+
+  private async findScopedVaccination(
+    petId: string,
+    vaccinationId: string,
+  ): Promise<StoredVaccination> {
+    const vaccination = await this.prisma.vaccination.findFirst({
+      where: { id: vaccinationId, petId },
+      select: vaccinationSelect,
+    });
+
+    if (!vaccination) {
+      throw new AppException({
+        statusCode: HttpStatus.NOT_FOUND,
+        code: ERROR_CODE.VACCINATION_NOT_FOUND,
+        message: ERROR_MESSAGE.VACCINATION_NOT_FOUND,
+      });
+    }
+
+    return vaccination;
   }
 
   private validateBusinessDates(
@@ -143,6 +268,10 @@ export class VaccinationsService {
     return new Date(`${value}T00:00:00.000Z`);
   }
 
+  private toBusinessDate(value: Date): string {
+    return value.toISOString().slice(0, 10);
+  }
+
   private invalidDatesException(details: {
     field: string;
     message: string;
@@ -162,9 +291,10 @@ export class VaccinationsService {
       id: vaccination.id,
       petId: vaccination.petId,
       vaccineName: vaccination.vaccineName,
-      appliedAt: vaccination.appliedAt.toISOString().slice(0, 10),
-      nextDueAt:
-        vaccination.nextDueAt?.toISOString().slice(0, 10) ?? null,
+      appliedAt: this.toBusinessDate(vaccination.appliedAt),
+      nextDueAt: vaccination.nextDueAt
+        ? this.toBusinessDate(vaccination.nextDueAt)
+        : null,
       veterinarianName: vaccination.veterinarianName,
       clinicName: vaccination.clinicName,
       notes: vaccination.notes,
