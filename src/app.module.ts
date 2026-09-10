@@ -10,6 +10,7 @@ import { HealthModule } from './health/health.module.js';
 import { PetAccessModule } from './pet-access/pet-access.module.js';
 import { PetsModule } from './pets/pets.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { VaccinationsModule } from './vaccinations/vaccinations.module.js';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
     PetAccessModule,
     PetsModule,
     PrismaModule,
+    VaccinationsModule,
   ],
   controllers: [AppController],
   providers: [
