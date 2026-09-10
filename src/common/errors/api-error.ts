@@ -5,7 +5,7 @@ export interface ApiErrorResponse {
   code: ErrorCode;
   error: string;
   message: string | string[];
-  details?: unknown;
+  details?: ValidationErrorDetail[] | null;
 }
 
 export interface ValidationErrorDetail {

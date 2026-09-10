@@ -1,13 +1,13 @@
 import { STATUS_CODES } from 'node:http';
 import { HttpException } from '@nestjs/common';
-import type { ApiErrorResponse } from './api-error.js';
+import type { ApiErrorResponse, ValidationErrorDetail } from './api-error.js';
 import type { ErrorCode } from './error-code.js';
 
 export interface AppExceptionOptions {
   statusCode: number;
   code: ErrorCode;
   message: string | string[];
-  details?: unknown;
+  details?: ValidationErrorDetail[] | null;
 }
 
 export class AppException extends HttpException {

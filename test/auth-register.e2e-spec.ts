@@ -148,10 +148,10 @@ describe('Auth registration (e2e)', () => {
         name: 'Unknown Property',
         email: createEmail(),
         password: 'secure-password',
-        role: 'ADMIN',
+        isAdmin: true,
       }),
     },
-  ])('rejects $caseName with the validation envelope', async ({ body }) => {
+  ])('rejects $caseName with the validation envelope', async ({ body, caseName }) => {
     const response = await request(app.getHttpServer())
       .post('/api/v1/auth/register')
       .send(body())
@@ -163,6 +163,15 @@ describe('Auth registration (e2e)', () => {
       error: 'Bad Request',
       message: 'Los datos enviados no son válidos.',
     });
-    expect(response.body.details).toEqual(expect.any(Array));
+    if (caseName === 'an unknown property') {
+      expect(response.body.details).toEqual([
+        {
+          field: 'isAdmin',
+          message: "La propiedad 'isAdmin' no está permitida.",
+        },
+      ]);
+    } else {
+      expect(response.body.details).toEqual(expect.any(Array));
+    }
   });
 });

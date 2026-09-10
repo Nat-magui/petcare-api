@@ -13,8 +13,14 @@ function collectValidationDetails(
     const field = parentPath
       ? `${parentPath}.${validationError.property}`
       : validationError.property;
-    const details = Object.values(validationError.constraints ?? {}).map(
-      (message) => ({ field, message }),
+    const details = Object.entries(validationError.constraints ?? {}).map(
+      ([constraint, message]) => ({
+        field,
+        message:
+          constraint === 'whitelistValidation'
+            ? `La propiedad '${validationError.property}' no está permitida.`
+            : message,
+      }),
     );
 
     return [

@@ -56,27 +56,30 @@ describe('API error foundation', () => {
     vi.restoreAllMocks();
   });
 
-  it('rejects unknown DTO properties with validation details', async () => {
-    const exception = await captureException(
-      createValidationPipe().transform(
-        { name: 'Milo', isAdmin: true },
-        bodyMetadata,
-      ),
-    );
+  it.each(['isAdmin', 'unexpectedField'])(
+    'maps unknown DTO property %s to the canonical validation detail',
+    async (property) => {
+      const exception = await captureException(
+        createValidationPipe().transform(
+          { name: 'Milo', [property]: true },
+          bodyMetadata,
+        ),
+      );
 
-    expect(exception.getResponse()).toEqual({
-      statusCode: HttpStatus.BAD_REQUEST,
-      code: ERROR_CODE.VALIDATION_ERROR,
-      error: 'Bad Request',
-      message: ERROR_MESSAGE.VALIDATION_ERROR,
-      details: [
-        {
-          field: 'isAdmin',
-          message: 'property isAdmin should not exist',
-        },
-      ],
-    });
-  });
+      expect(exception.getResponse()).toEqual({
+        statusCode: HttpStatus.BAD_REQUEST,
+        code: ERROR_CODE.VALIDATION_ERROR,
+        error: 'Bad Request',
+        message: ERROR_MESSAGE.VALIDATION_ERROR,
+        details: [
+          {
+            field: property,
+            message: `La propiedad '${property}' no está permitida.`,
+          },
+        ],
+      });
+    },
+  );
 
   it('returns field-level details for invalid DTO values', async () => {
     const exception = await captureException(

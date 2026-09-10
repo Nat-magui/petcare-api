@@ -275,7 +275,7 @@ describe('Vaccination creation (e2e)', () => {
     expect(response.body).toMatchObject({
       code: 'VACCINATION_INVALID_DATES',
       message: 'Las fechas de vacunación no son válidas.',
-      details: { field },
+      details: [expect.objectContaining({ field })],
     });
     await expect(
       prisma.vaccination.count({ where: { petId } }),

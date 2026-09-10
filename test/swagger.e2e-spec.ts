@@ -194,6 +194,15 @@ describe('Swagger / OpenAPI (e2e)', () => {
   });
 
   it('documents endpoint-specific errors without sensitive response fields', () => {
+    expect(document.components?.schemas?.ApiErrorResponseDto).toMatchObject({
+      properties: {
+        details: {
+          type: 'array',
+          nullable: true,
+          items: { $ref: '#/components/schemas/ApiErrorDetailDto' },
+        },
+      },
+    });
     expect(operation('/api/v1/auth/register', 'post').responses).toMatchObject({
       400: { description: 'VALIDATION_ERROR' },
       409: {

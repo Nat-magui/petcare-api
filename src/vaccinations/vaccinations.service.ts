@@ -280,7 +280,7 @@ export class VaccinationsService {
       statusCode: HttpStatus.BAD_REQUEST,
       code: ERROR_CODE.VACCINATION_INVALID_DATES,
       message: ERROR_MESSAGE.VACCINATION_INVALID_DATES,
-      details,
+      details: [details],
     });
   }
 

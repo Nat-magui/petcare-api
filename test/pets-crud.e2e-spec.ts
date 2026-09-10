@@ -304,7 +304,7 @@ describe('Pet CRUD (e2e)', () => {
 
       expect(response.body).toMatchObject({
         code: 'PET_ROLE_FORBIDDEN',
-        message: 'Tu rol no permite realizar esta acción.',
+        message: 'Tu rol no permite realizar esta acción sobre la mascota.',
       });
       await expect(findStoredPet(petId)).resolves.toEqual(before);
     });

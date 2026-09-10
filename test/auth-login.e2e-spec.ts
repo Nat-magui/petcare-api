@@ -118,7 +118,7 @@ describe('Auth login (e2e)', () => {
       statusCode: 401,
       code: 'AUTH_INVALID_CREDENTIALS',
       error: 'Unauthorized',
-      message: 'Las credenciales son inválidas.',
+      message: 'Las credenciales ingresadas no son válidas.',
     };
     expect(nonexistentResponse.body).toEqual(expectedError);
     expect(wrongPasswordResponse.body).toEqual(expectedError);

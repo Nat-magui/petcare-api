@@ -148,10 +148,12 @@ describe('VaccinationsService', () => {
         statusCode: HttpStatus.BAD_REQUEST,
         code: ERROR_CODE.VACCINATION_INVALID_DATES,
         message: ERROR_MESSAGE.VACCINATION_INVALID_DATES,
-        details: {
-          field: 'appliedAt',
-          message: 'La fecha de aplicación no puede ser futura.',
-        },
+        details: [
+          {
+            field: 'appliedAt',
+            message: 'La fecha de aplicación no puede ser futura.',
+          },
+        ],
       },
     });
     expect(prisma.vaccination.create).not.toHaveBeenCalled();
@@ -167,7 +169,7 @@ describe('VaccinationsService', () => {
     ).rejects.toMatchObject({
       response: {
         code: ERROR_CODE.VACCINATION_INVALID_DATES,
-        details: { field: 'nextDueAt' },
+        details: [{ field: 'nextDueAt' }],
       },
     });
     expect(prisma.vaccination.create).not.toHaveBeenCalled();
@@ -299,7 +301,7 @@ describe('VaccinationsService', () => {
     ).rejects.toMatchObject({
       response: {
         code: ERROR_CODE.VACCINATION_INVALID_DATES,
-        details: { field: 'nextDueAt' },
+        details: [{ field: 'nextDueAt' }],
       },
     });
     expect(prisma.vaccination.update).not.toHaveBeenCalled();

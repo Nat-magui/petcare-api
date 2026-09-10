@@ -161,14 +161,10 @@ export class ApiErrorResponseDto {
   message: string;
 
   @ApiPropertyOptional({
-    description: 'Contexto seguro y opcional del error.',
-    oneOf: [
-      {
-        type: 'array',
-        items: { $ref: '#/components/schemas/ApiErrorDetailDto' },
-      },
-      { $ref: '#/components/schemas/ApiErrorDetailDto' },
-    ],
+    description: 'Detalle opcional de campos inválidos.',
+    type: () => ApiErrorDetailDto,
+    isArray: true,
+    nullable: true,
   })
-  details?: ApiErrorDetailDto[] | ApiErrorDetailDto;
+  details?: ApiErrorDetailDto[] | null;
 }

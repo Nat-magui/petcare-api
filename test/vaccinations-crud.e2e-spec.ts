@@ -252,7 +252,10 @@ describe('Vaccination CRUD (e2e)', () => {
         .set(authorization(owner))
         .send({ notes: 'No update' })
         .expect(404);
-      expect(response.body).toMatchObject({ code: 'VACCINATION_NOT_FOUND' });
+      expect(response.body).toMatchObject({
+        code: 'VACCINATION_NOT_FOUND',
+        message: 'No se encontró la vacunación solicitada para esta mascota.',
+      });
     });
 
     it.each([
@@ -307,7 +310,7 @@ describe('Vaccination CRUD (e2e)', () => {
         .expect(400);
       expect(response.body).toMatchObject({
         code: 'VACCINATION_INVALID_DATES',
-        details: { field },
+        details: [expect.objectContaining({ field })],
       });
       const after = await prisma.vaccination.findUniqueOrThrow({
         where: { id: vaccinationId },
