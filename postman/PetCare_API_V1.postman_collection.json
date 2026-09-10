@@ -1,0 +1,2547 @@
+{
+  "info": {
+    "_postman_id": "173d150b-2d99-4790-88c9-e37b22630f75",
+    "name": "PetCare API V1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "38704214"
+  },
+  "item": [
+    {
+      "name": "00 - Setup",
+      "item": [
+        {
+          "name": "00 - Health & Initialize Run",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const runId = Date.now().toString();\r",
+                  "\r",
+                  "pm.environment.set(\"runId\", runId);\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "  \"ownerEmail\",\r",
+                  "  `owner+${runId}@example.com`\r",
+                  ");\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "  \"caregiverEmail\",\r",
+                  "  `caregiver+${runId}@example.com`\r",
+                  ");\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "  \"viewerEmail\",\r",
+                  "  `viewer+${runId}@example.com`\r",
+                  ");\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "  \"outsiderEmail\",\r",
+                  "  `outsider+${runId}@example.com`\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Health returns 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Health status is ok\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "  pm.expect(body.status).to.eql(\"ok\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 - Auth",
+      "item": [
+        {
+          "name": "01 - Register OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Register OWNER returns 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Register OWNER returns only public user fields\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body).to.have.property(\"id\");\r",
+                  "  pm.expect(body).to.have.property(\"name\");\r",
+                  "  pm.expect(body).to.have.property(\"email\");\r",
+                  "  pm.expect(body).to.have.property(\"createdAt\");\r",
+                  "\r",
+                  "  pm.expect(body).to.not.have.property(\"password\");\r",
+                  "  pm.expect(body).to.not.have.property(\"passwordHash\");\r",
+                  "  pm.expect(body).to.not.have.property(\"refreshTokenHash\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Owner Test\",\r\n  \"email\": \"{{ownerEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Register CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Register OWNER returns 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Register OWNER returns only public user fields\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body).to.have.property(\"id\");\r",
+                  "  pm.expect(body).to.have.property(\"name\");\r",
+                  "  pm.expect(body).to.have.property(\"email\");\r",
+                  "  pm.expect(body).to.have.property(\"createdAt\");\r",
+                  "\r",
+                  "  pm.expect(body).to.not.have.property(\"password\");\r",
+                  "  pm.expect(body).to.not.have.property(\"passwordHash\");\r",
+                  "  pm.expect(body).to.not.have.property(\"refreshTokenHash\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Caregiver Test\",\r\n  \"email\": \"{{caregiverEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Register VIEWER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Register OWNER returns 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Register OWNER returns only public user fields\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body).to.have.property(\"id\");\r",
+                  "  pm.expect(body).to.have.property(\"name\");\r",
+                  "  pm.expect(body).to.have.property(\"email\");\r",
+                  "  pm.expect(body).to.have.property(\"createdAt\");\r",
+                  "\r",
+                  "  pm.expect(body).to.not.have.property(\"password\");\r",
+                  "  pm.expect(body).to.not.have.property(\"passwordHash\");\r",
+                  "  pm.expect(body).to.not.have.property(\"refreshTokenHash\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Viewer Test\",\r\n  \"email\": \"{{viewerEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Register OUTSIDER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Register OWNER returns 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Register OWNER returns only public user fields\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body).to.have.property(\"id\");\r",
+                  "  pm.expect(body).to.have.property(\"name\");\r",
+                  "  pm.expect(body).to.have.property(\"email\");\r",
+                  "  pm.expect(body).to.have.property(\"createdAt\");\r",
+                  "\r",
+                  "  pm.expect(body).to.not.have.property(\"password\");\r",
+                  "  pm.expect(body).to.not.have.property(\"passwordHash\");\r",
+                  "  pm.expect(body).to.not.have.property(\"refreshTokenHash\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Outsider Test\",\r\n  \"email\": \"{{outsiderEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 - Login OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login OWNER returns 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Login OWNER returns access and refresh tokens\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.accessToken).to.be.a(\"string\");\r",
+                  "  pm.expect(body.refreshToken).to.be.a(\"string\");\r",
+                  "  pm.expect(body.user.email).to.eql(pm.environment.get(\"ownerEmail\"));\r",
+                  "\r",
+                  "  pm.expect(body.user).to.not.have.property(\"password\");\r",
+                  "  pm.expect(body.user).to.not.have.property(\"passwordHash\");\r",
+                  "  pm.expect(body.user).to.not.have.property(\"refreshTokenHash\");\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"ownerAccessToken\", body.accessToken);\r",
+                  "pm.environment.set(\"ownerRefreshToken\", body.refreshToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{ownerEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 - Login CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login CAREGIVER returns 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.expect(body.accessToken).to.be.a(\"string\");\r",
+                  "pm.expect(body.user.email).to.eql(pm.environment.get(\"caregiverEmail\"));\r",
+                  "\r",
+                  "pm.environment.set(\"caregiverAccessToken\", body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{caregiverEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 - Login VIEWER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login VIEWER returns 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.expect(body.accessToken).to.be.a(\"string\");\r",
+                  "pm.expect(body.user.email).to.eql(pm.environment.get(\"viewerEmail\"));\r",
+                  "\r",
+                  "pm.environment.set(\"viewerAccessToken\", body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{viewerEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 - Login OUTSIDER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login OUTSIDER returns 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.expect(body.accessToken).to.be.a(\"string\");\r",
+                  "pm.expect(body.user.email).to.eql(pm.environment.get(\"outsiderEmail\"));\r",
+                  "\r",
+                  "pm.environment.set(\"outsiderAccessToken\", body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{outsiderEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Pets",
+      "item": [
+        {
+          "name": "01 - Create Pet as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER creates Pet with 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created Pet has OWNER role\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.be.a(\"string\");\r",
+                  "  pm.expect(body.name).to.eql(\"Luna\");\r",
+                  "  pm.expect(body.species).to.eql(\"DOG\");\r",
+                  "  pm.expect(body.myRole).to.eql(\"OWNER\");\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"petId\", body.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Luna\",\r\n  \"species\": \"DOG\",\r\n  \"breed\": \"Mestiza\",\r\n  \"birthDate\": \"2022-05-10\",\r\n  \"careMode\": \"FAMILY\",\r\n  \"rescueOrganizationName\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - List Pets as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER lists Pets with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"List contains Luna with OWNER role\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body).to.be.an(\"array\");\r",
+                  "\r",
+                  "  const pet = body.find(p => p.id === pm.environment.get(\"petId\"));\r",
+                  "\r",
+                  "  pm.expect(pet).to.exist;\r",
+                  "  pm.expect(pet.name).to.eql(\"Luna\");\r",
+                  "  pm.expect(pet.myRole).to.eql(\"OWNER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Get Pet Detail as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER gets Pet detail with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Pet detail matches the created Pet\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.name).to.eql(\"Luna\");\r",
+                  "  pm.expect(body.myRole).to.eql(\"OWNER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Get Pet Detail as OUTSIDER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OUTSIDER cannot access Pet\", function () {\r",
+                  "  pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns PET_ACCESS_DENIED\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_ACCESS_DENIED\");\r",
+                  "  pm.expect(body.message).to.eql(\"No tenés acceso a esta mascota.\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{outsiderAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - PetAccess",
+      "item": [
+        {
+          "name": "01 - Add CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER adds CAREGIVER with 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created access has CAREGIVER role\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.userId).to.be.a(\"string\");\r",
+                  "  pm.expect(body.email).to.eql(pm.environment.get(\"caregiverEmail\"));\r",
+                  "  pm.expect(body.role).to.eql(\"CAREGIVER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{caregiverEmail}}\",\r\n  \"role\": \"CAREGIVER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/access",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "access"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Add VIEWER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER adds VIEWER with 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created access has VIEWER role\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.userId).to.be.a(\"string\");\r",
+                  "  pm.expect(body.email).to.eql(pm.environment.get(\"viewerEmail\"));\r",
+                  "  pm.expect(body.role).to.eql(\"VIEWER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{viewerEmail}}\",\r\n  \"role\": \"VIEWER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/access",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "access"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - List PetAccess as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "const owner = body.find(\r",
+                  "  access => access.email === pm.environment.get(\"ownerEmail\")\r",
+                  ");\r",
+                  "\r",
+                  "const caregiver = body.find(\r",
+                  "  access => access.email === pm.environment.get(\"caregiverEmail\")\r",
+                  ");\r",
+                  "\r",
+                  "const viewer = body.find(\r",
+                  "  access => access.email === pm.environment.get(\"viewerEmail\")\r",
+                  ");\r",
+                  "\r",
+                  "pm.test(\"OWNER lists PetAccess with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Pet has OWNER, CAREGIVER and VIEWER\", function () {\r",
+                  "  pm.expect(body).to.be.an(\"array\");\r",
+                  "\r",
+                  "  pm.expect(owner).to.exist;\r",
+                  "  pm.expect(owner.role).to.eql(\"OWNER\");\r",
+                  "\r",
+                  "  pm.expect(caregiver).to.exist;\r",
+                  "  pm.expect(caregiver.role).to.eql(\"CAREGIVER\");\r",
+                  "\r",
+                  "  pm.expect(viewer).to.exist;\r",
+                  "  pm.expect(viewer.role).to.eql(\"VIEWER\");\r",
+                  "});\r",
+                  "\r",
+                  "// Variables para requests posteriores\r",
+                  "pm.environment.set(\"ownerUserId\", owner.userId);\r",
+                  "pm.environment.set(\"sharedUserId\", caregiver.userId);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/access",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "access"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Get Pet Detail as CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"CAREGIVER gets Pet detail with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Pet is visible with CAREGIVER role\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.name).to.eql(\"Luna\");\r",
+                  "  pm.expect(body.myRole).to.eql(\"CAREGIVER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{caregiverAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 - Get Pet Detail as VIEWER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"VIEWER gets Pet detail with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Pet is visible with VIEWER role\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.name).to.eql(\"Luna\");\r",
+                  "  pm.expect(body.myRole).to.eql(\"VIEWER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{viewerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Vaccinations",
+      "item": [
+        {
+          "name": "01 - Create Vaccination as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER creates Vaccination with 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created Vaccination has expected data\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.be.a(\"string\");\r",
+                  "  pm.expect(body.petId).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.vaccineName).to.eql(\"Antirrábica\");\r",
+                  "  pm.expect(body.appliedAt).to.eql(\"2026-09-01\");\r",
+                  "  pm.expect(body.nextDueAt).to.eql(\"2027-09-01\");\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"vaccinationId\", body.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"vaccineName\": \"Antirrábica\",\r\n  \"appliedAt\": \"2026-09-01\",\r\n  \"nextDueAt\": \"2027-09-01\",\r\n  \"veterinarianName\": \"Dra. Ana Pérez\",\r\n  \"clinicName\": \"Veterinaria Patitas\",\r\n  \"notes\": \"Aplicación anual sin complicaciones.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - List Vaccinations as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER lists Vaccinations with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"List contains created Vaccination\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body).to.be.an(\"array\");\r",
+                  "\r",
+                  "  const vaccination = body.find(\r",
+                  "    item => item.id === pm.environment.get(\"vaccinationId\")\r",
+                  "  );\r",
+                  "\r",
+                  "  pm.expect(vaccination).to.exist;\r",
+                  "  pm.expect(vaccination.petId).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(vaccination.vaccineName).to.eql(\"Antirrábica\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Get Vaccination Detail as OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OWNER gets Vaccination detail with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Vaccination detail matches created record\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.eql(pm.environment.get(\"vaccinationId\"));\r",
+                  "  pm.expect(body.petId).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.vaccineName).to.eql(\"Antirrábica\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Update Vaccination as CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"CAREGIVER updates Vaccination with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"PATCH updates sent fields and preserves omitted fields\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.eql(pm.environment.get(\"vaccinationId\"));\r",
+                  "  pm.expect(body.petId).to.eql(pm.environment.get(\"petId\"));\r",
+                  "\r",
+                  "  pm.expect(body.clinicName).to.eql(\"Centro Veterinario Junín\");\r",
+                  "  pm.expect(body.notes).to.eql(\"Control realizado por CAREGIVER.\");\r",
+                  "\r",
+                  "  // Campos omitidos: deben conservarse\r",
+                  "  pm.expect(body.vaccineName).to.eql(\"Antirrábica\");\r",
+                  "  pm.expect(body.appliedAt).to.eql(\"2026-09-01\");\r",
+                  "  pm.expect(body.nextDueAt).to.eql(\"2027-09-01\");\r",
+                  "  pm.expect(body.veterinarianName).to.eql(\"Dra. Ana Pérez\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{caregiverAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"clinicName\": \"Centro Veterinario Junín\",\r\n  \"notes\": \"Control realizado por CAREGIVER.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 - Get Vaccination Detail as VIEWER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"VIEWER gets Vaccination detail with 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"VIEWER can read updated Vaccination\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.eql(pm.environment.get(\"vaccinationId\"));\r",
+                  "  pm.expect(body.petId).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.vaccineName).to.eql(\"Antirrábica\");\r",
+                  "  pm.expect(body.clinicName).to.eql(\"Centro Veterinario Junín\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{viewerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 - Update Vaccination as VIEWER - Forbidden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"VIEWER cannot update Vaccination\", function () {\r",
+                  "  pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns PET_ROLE_FORBIDDEN\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_ROLE_FORBIDDEN\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"Tu rol no permite realizar esta acción sobre la mascota.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{viewerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"notes\": \"VIEWER intenta modificar esta vacunación.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 - Create Temporary Vaccination as CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"CAREGIVER creates Vaccination with 201\", function () {\r",
+                  "  pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Temporary Vaccination was created\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.id).to.be.a(\"string\");\r",
+                  "  pm.expect(body.petId).to.eql(pm.environment.get(\"petId\"));\r",
+                  "  pm.expect(body.vaccineName).to.eql(\"Séxtuple\");\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"tempVaccinationId\", body.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{caregiverAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"vaccineName\": \"Séxtuple\",\r\n  \"appliedAt\": \"2026-08-15\",\r\n  \"nextDueAt\": null,\r\n  \"veterinarianName\": \"Dr. Carlos Gómez\",\r\n  \"clinicName\": \"Centro Veterinario Junín\",\r\n  \"notes\": \"Registro temporal para prueba de eliminación.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 - Delete Vaccination as CAREGIVER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"CAREGIVER deletes Vaccination with 204\", function () {\r",
+                  "  pm.response.to.have.status(204);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Delete response has no body\", function () {\r",
+                  "  pm.expect(pm.response.text()).to.eql(\"\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{caregiverAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{tempVaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{tempVaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 - Get Deleted Vaccination - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deleted Vaccination returns 404\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns VACCINATION_NOT_FOUND\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"VACCINATION_NOT_FOUND\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"No se encontró la vacunación solicitada para esta mascota.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{caregiverAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{tempVaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{tempVaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Auth Session",
+      "item": [
+        {
+          "name": "01 - Refresh OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Refresh returns 200\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Refresh returns only a new access token\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.accessToken).to.be.a(\"string\");\r",
+                  "  pm.expect(body).to.not.have.property(\"refreshToken\");\r",
+                  "});\r",
+                  "\r",
+                  "const body = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"ownerAccessToken\", body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"{{ownerRefreshToken}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Get Me after Refresh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Refreshed access token works\", function () {\r",
+                  "  pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Current user is OWNER account\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.email).to.eql(pm.environment.get(\"ownerEmail\"));\r",
+                  "  pm.expect(body).to.have.property(\"id\");\r",
+                  "  pm.expect(body).to.have.property(\"name\");\r",
+                  "  pm.expect(body).to.have.property(\"createdAt\");\r",
+                  "\r",
+                  "  pm.expect(body).to.not.have.property(\"passwordHash\");\r",
+                  "  pm.expect(body).to.not.have.property(\"refreshTokenHash\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Logout OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Logout returns 204\", function () {\r",
+                  "  pm.response.to.have.status(204);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Logout response has no body\", function () {\r",
+                  "  pm.expect(pm.response.text()).to.eql(\"\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set(\r",
+                  "  \"loggedOutOwnerRefreshToken\",\r",
+                  "  pm.environment.get(\"ownerRefreshToken\")\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"{{ownerRefreshToken}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Refresh after Logout - Invalid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Refresh after logout returns 401\", function () {\r",
+                  "  pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns AUTH_REFRESH_INVALID\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"AUTH_REFRESH_INVALID\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"{{loggedOutOwnerRefreshToken}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Error Cases",
+      "item": [
+        {
+          "name": "01 - Register Duplicate Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Duplicate email returns 409\", function () {\r",
+                  "  pm.response.to.have.status(409);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns AUTH_EMAIL_IN_USE\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"AUTH_EMAIL_IN_USE\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"El correo electrónico ya está registrado.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Owner Test\",\r\n  \"email\": \"{{ownerEmail}}\",\r\n  \"password\": \"Test1234!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Login Invalid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Invalid credentials return 401\", function () {\r",
+                  "  pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns canonical AUTH_INVALID_CREDENTIALS\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"AUTH_INVALID_CREDENTIALS\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"Las credenciales ingresadas no son válidas.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{ownerEmail}}\",\r\n  \"password\": \"Incorrecta123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Get Pet without Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Private Pet route without token returns 401\", function () {\r",
+                  "  pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns AUTH_ACCESS_REQUIRED\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"AUTH_ACCESS_REQUIRED\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"Necesitás iniciar sesión para continuar.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Get Pet as OUTSIDER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"OUTSIDER cannot access Pet\", function () {\r",
+                  "  pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns PET_ACCESS_DENIED\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_ACCESS_DENIED\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"No tenés acceso a esta mascota.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{outsiderAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 - Viewer Updates Vaccination",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"VIEWER cannot update Vaccination\", function () {\r",
+                  "  pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns canonical PET_ROLE_FORBIDDEN\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_ROLE_FORBIDDEN\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"Tu rol no permite realizar esta acción sobre la mascota.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{viewerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"notes\": \"VIEWER intenta modificar esta vacunación.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{vaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{vaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 - Create Pet with Future Birth Date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Future birth date returns 400\", function () {\r",
+                  "  pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns PET_INVALID_BIRTH_DATE\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_INVALID_BIRTH_DATE\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"La fecha de nacimiento no puede ser futura.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Future Pet\",\r\n  \"species\": \"CAT\",\r\n  \"breed\": null,\r\n  \"birthDate\": \"2030-01-01\",\r\n  \"careMode\": \"FAMILY\",\r\n  \"rescueOrganizationName\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 - Create Vaccination with Invalid Dates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Invalid vaccination dates return 400\", function () {\r",
+                  "  pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns VACCINATION_INVALID_DATES\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"VACCINATION_INVALID_DATES\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"Las fechas de vacunación no son válidas.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"vaccineName\": \"Antirrábica inválida\",\r\n  \"appliedAt\": \"2026-09-01\",\r\n  \"nextDueAt\": \"2026-08-01\",\r\n  \"veterinarianName\": \"Dra. Ana Pérez\",\r\n  \"clinicName\": \"Veterinaria Patitas\",\r\n  \"notes\": \"Caso de prueba con fechas inválidas.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 - Add Duplicate PetAccess",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Duplicate PetAccess returns 409\", function () {\r",
+                  "  pm.response.to.have.status(409);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns PET_ACCESS_EXISTS\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_ACCESS_EXISTS\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"El usuario ya tiene acceso a esta mascota.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{caregiverEmail}}\",\r\n  \"role\": \"CAREGIVER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/access",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "access"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 - Downgrade Last OWNER",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Downgrading last OWNER returns 409\", function () {\r",
+                  "  pm.response.to.have.status(409);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns PET_LAST_OWNER\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"PET_LAST_OWNER\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"La mascota debe conservar al menos un OWNER.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"CAREGIVER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/access/{{ownerUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "access",
+                "{{ownerUserId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10 - Invalid Pet UUID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Invalid UUID returns 400\", function () {\r",
+                  "  pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns INVALID_IDENTIFIER\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"INVALID_IDENTIFIER\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/no-es-un-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "no-es-un-uuid"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11 - Vaccination Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Unknown Vaccination returns 404\", function () {\r",
+                  "  pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns canonical VACCINATION_NOT_FOUND\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"VACCINATION_NOT_FOUND\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"No se encontró la vacunación solicitada para esta mascota.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ownerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}/vaccinations/{{tempVaccinationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pets",
+                "{{petId}}",
+                "vaccinations",
+                "{{tempVaccinationId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12 - Refresh after Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Refresh after logout returns 401\", function () {\r",
+                  "  pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns AUTH_REFRESH_INVALID\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"AUTH_REFRESH_INVALID\");\r",
+                  "  pm.expect(body.message).to.eql(\r",
+                  "    \"La sesión ya no puede renovarse. Iniciá sesión nuevamente.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"{{loggedOutOwnerRefreshToken}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13 - Register with Unknown Property",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Unknown property returns 400\", function () {\r",
+                  "  pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returns canonical VALIDATION_ERROR detail\", function () {\r",
+                  "  const body = pm.response.json();\r",
+                  "\r",
+                  "  pm.expect(body.code).to.eql(\"VALIDATION_ERROR\");\r",
+                  "  pm.expect(body.details).to.be.an(\"array\");\r",
+                  "\r",
+                  "  const detail = body.details.find(\r",
+                  "    item => item.field === \"isAdmin\"\r",
+                  "  );\r",
+                  "\r",
+                  "  pm.expect(detail).to.exist;\r",
+                  "  pm.expect(detail.message).to.eql(\r",
+                  "    \"La propiedad 'isAdmin' no está permitida.\"\r",
+                  "  );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Unknown Property Test\",\r\n  \"email\": \"unknown+{{$timestamp}}@example.com\",\r\n  \"password\": \"Test1234!\",\r\n  \"isAdmin\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
