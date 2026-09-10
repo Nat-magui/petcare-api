@@ -7,10 +7,12 @@ import {
   Matches,
   MaxLength,
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 const BUSINESS_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 export class CreateVaccinationDto {
+  @ApiProperty({ minLength: 2, maxLength: 120, example: 'Rabies' })
   @IsString({ message: 'El nombre de la vacuna es obligatorio.' })
   @IsNotEmpty({ message: 'El nombre de la vacuna es obligatorio.' })
   @Length(2, 120, {
@@ -18,6 +20,7 @@ export class CreateVaccinationDto {
   })
   vaccineName: string;
 
+  @ApiProperty({ type: String, format: 'date', example: '2026-08-15' })
   @Matches(BUSINESS_DATE_PATTERN, {
     message: 'La fecha de aplicación debe usar el formato YYYY-MM-DD.',
   })
@@ -29,6 +32,12 @@ export class CreateVaccinationDto {
   )
   appliedAt: string;
 
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date',
+    nullable: true,
+    example: '2027-08-15',
+  })
   @IsOptional()
   @Matches(BUSINESS_DATE_PATTERN, {
     message: 'La próxima fecha debe usar el formato YYYY-MM-DD.',
@@ -41,6 +50,11 @@ export class CreateVaccinationDto {
   )
   nextDueAt?: string | null;
 
+  @ApiPropertyOptional({
+    maxLength: 120,
+    nullable: true,
+    example: 'Dra. Pérez',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(120, {
@@ -48,6 +62,11 @@ export class CreateVaccinationDto {
   })
   veterinarianName?: string | null;
 
+  @ApiPropertyOptional({
+    maxLength: 120,
+    nullable: true,
+    example: 'Clínica Central',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(120, {
@@ -55,6 +74,11 @@ export class CreateVaccinationDto {
   })
   clinicName?: string | null;
 
+  @ApiPropertyOptional({
+    maxLength: 1000,
+    nullable: true,
+    example: 'Primera dosis anual.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(1000, {

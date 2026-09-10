@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
+import { configureSwagger } from './common/swagger/swagger.config.js';
 import { getCorsOrigin } from './config/security.config.js';
 
 export function configureApp(
@@ -19,4 +20,5 @@ export function configureApp(
     },
   });
   app.setGlobalPrefix('api/v1');
+  configureSwagger(app);
 }
