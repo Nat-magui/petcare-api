@@ -28,6 +28,12 @@ describe('PetsService', () => {
   let prisma: {
     pet: {
       create: ReturnType<typeof vi.fn>;
+      findUnique: ReturnType<typeof vi.fn>;
+      update: ReturnType<typeof vi.fn>;
+      delete: ReturnType<typeof vi.fn>;
+    };
+    petAccess: {
+      findMany: ReturnType<typeof vi.fn>;
     };
   };
   let service: PetsService;
@@ -36,6 +42,12 @@ describe('PetsService', () => {
     prisma = {
       pet: {
         create: vi.fn(),
+        findUnique: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+      },
+      petAccess: {
+        findMany: vi.fn(),
       },
     };
     service = new PetsService(prisma as unknown as PrismaService);
@@ -121,5 +133,109 @@ describe('PetsService', () => {
       }),
     ).rejects.toBe(persistenceError);
     expect(prisma.pet.create).toHaveBeenCalledOnce();
+  });
+
+  it('lists only access rows for the current user and maps their roles', async () => {
+    prisma.petAccess.findMany.mockResolvedValue([
+      { role: PetAccessRole.VIEWER, pet: storedPet },
+    ]);
+
+    await expect(service.findAll(userId)).resolves.toEqual([
+      {
+        ...storedPet,
+        birthDate: '2024-03-10',
+        myRole: PetAccessRole.VIEWER,
+      },
+    ]);
+    expect(prisma.petAccess.findMany).toHaveBeenCalledWith({
+      where: { userId },
+      select: {
+        role: true,
+        pet: {
+          select: {
+            id: true,
+            name: true,
+            species: true,
+            breed: true,
+            birthDate: true,
+            careMode: true,
+            rescueOrganizationName: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+  });
+
+  it('resolves Pet existence before access denial', async () => {
+    prisma.pet.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce({
+      ...storedPet,
+      accesses: [],
+    });
+
+    await expect(service.findOne(userId, storedPet.id)).rejects.toMatchObject({
+      response: { code: ERROR_CODE.PET_NOT_FOUND },
+    });
+    await expect(service.findOne(userId, storedPet.id)).rejects.toMatchObject({
+      response: { code: ERROR_CODE.PET_ACCESS_DENIED },
+    });
+  });
+
+  it('applies only provided PATCH values for CAREGIVER', async () => {
+    prisma.pet.findUnique.mockResolvedValue({
+      ...storedPet,
+      accesses: [{ role: PetAccessRole.CAREGIVER }],
+    });
+    prisma.pet.update.mockResolvedValue({
+      ...storedPet,
+      name: 'Luna actualizada',
+      breed: null,
+    });
+
+    const result = await service.update(userId, storedPet.id, {
+      name: 'Luna actualizada',
+      breed: null,
+    });
+
+    expect(prisma.pet.update).toHaveBeenCalledWith({
+      where: { id: storedPet.id },
+      data: { name: 'Luna actualizada', breed: null },
+      select: expect.any(Object),
+    });
+    expect(result).toMatchObject({
+      name: 'Luna actualizada',
+      breed: null,
+      species: storedPet.species,
+      myRole: PetAccessRole.CAREGIVER,
+    });
+  });
+
+  it('rejects VIEWER before issuing an update', async () => {
+    prisma.pet.findUnique.mockResolvedValue({
+      ...storedPet,
+      accesses: [{ role: PetAccessRole.VIEWER }],
+    });
+
+    await expect(
+      service.update(userId, storedPet.id, { name: 'Forbidden' }),
+    ).rejects.toMatchObject({
+      response: { code: ERROR_CODE.PET_ROLE_FORBIDDEN },
+    });
+    expect(prisma.pet.update).not.toHaveBeenCalled();
+  });
+
+  it('allows OWNER to delete the Pet resource', async () => {
+    prisma.pet.findUnique.mockResolvedValue({
+      ...storedPet,
+      accesses: [{ role: PetAccessRole.OWNER }],
+    });
+    prisma.pet.delete.mockResolvedValue({ id: storedPet.id });
+
+    await expect(service.delete(userId, storedPet.id)).resolves.toBeUndefined();
+    expect(prisma.pet.delete).toHaveBeenCalledWith({
+      where: { id: storedPet.id },
+      select: { id: true },
+    });
   });
 });

@@ -1,4 +1,8 @@
-import type { CareMode, Species } from '../generated/prisma/client.js';
+import type {
+  CareMode,
+  PetAccessRole,
+  Species,
+} from '../generated/prisma/client.js';
 
 export interface PetResponse {
   id: string;
@@ -8,7 +12,7 @@ export interface PetResponse {
   birthDate: string | null;
   careMode: CareMode;
   rescueOrganizationName: string | null;
-  myRole: 'OWNER';
+  myRole: PetAccessRole;
   createdAt: Date;
   updatedAt: Date;
 }
