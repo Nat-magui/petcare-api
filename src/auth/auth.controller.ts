@@ -7,6 +7,11 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import {
+  getAuthThrottleLimit,
+  getAuthThrottleTtl,
+} from '../config/security.config.js';
 import type { PublicUser } from '../users/users.types.js';
 import {
   AuthService,
@@ -25,6 +30,12 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @Throttle({
+    default: {
+      limit: getAuthThrottleLimit,
+      ttl: getAuthThrottleTtl,
+    },
+  })
   register(@Body() registerDto: RegisterDto): Promise<PublicUser> {
     return this.authService.register(registerDto);
   }
@@ -32,6 +43,12 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: {
+      limit: getAuthThrottleLimit,
+      ttl: getAuthThrottleTtl,
+    },
+  })
   login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
     return this.authService.login(loginDto);
   }

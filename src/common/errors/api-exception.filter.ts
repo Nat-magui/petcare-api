@@ -78,6 +78,16 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<HttpResponse>();
 
     if (exception instanceof HttpException) {
+      if (exception.getStatus() === HttpStatus.TOO_MANY_REQUESTS) {
+        response.status(HttpStatus.TOO_MANY_REQUESTS).json({
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          code: ERROR_CODE.RATE_LIMIT_EXCEEDED,
+          error: 'Too Many Requests',
+          message: ERROR_MESSAGE.RATE_LIMIT_EXCEEDED,
+        });
+        return;
+      }
+
       const exceptionResponse = exception.getResponse();
 
       if (isApiErrorResponse(exceptionResponse)) {

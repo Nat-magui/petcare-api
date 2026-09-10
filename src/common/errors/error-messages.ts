@@ -1,6 +1,8 @@
 export const ERROR_MESSAGE = {
   VALIDATION_ERROR: 'Los datos enviados no son válidos.',
   INVALID_IDENTIFIER: 'El identificador enviado no es válido.',
+  RATE_LIMIT_EXCEEDED:
+    'Se realizaron demasiadas solicitudes. Intentá nuevamente más tarde.',
   INTERNAL_ERROR: 'Ocurrió un error interno. Intentá nuevamente más tarde.',
   AUTH_EMAIL_IN_USE: 'El correo electrónico ya está registrado.',
   AUTH_INVALID_CREDENTIALS: 'Las credenciales son inválidas.',
