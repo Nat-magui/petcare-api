@@ -97,6 +97,20 @@ export class AuthService {
     };
   }
 
+  async getCurrentUser(userId: string): Promise<PublicUser> {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new AppException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        code: ERROR_CODE.AUTH_ACCESS_REQUIRED,
+        message: ERROR_MESSAGE.AUTH_ACCESS_REQUIRED,
+      });
+    }
+
+    return user;
+  }
+
   private emailInUseException(): AppException {
     return new AppException({
       statusCode: HttpStatus.CONFLICT,
