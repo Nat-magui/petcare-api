@@ -12,4 +12,8 @@ export const ERROR_MESSAGE = {
   PET_ACCESS_DENIED: 'No tenés acceso a esta mascota.',
   PET_ROLE_FORBIDDEN: 'Tu rol no permite realizar esta acción.',
   PET_INVALID_BIRTH_DATE: 'La fecha de nacimiento no puede ser futura.',
+  PET_ACCESS_EXISTS: 'El usuario ya tiene acceso a esta mascota.',
+  PET_ACCESS_NOT_FOUND:
+    'No se encontró el acceso solicitado para esta mascota.',
+  PET_LAST_OWNER: 'La mascota debe conservar al menos un OWNER.',
 } as const;

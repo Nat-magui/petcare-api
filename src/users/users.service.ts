@@ -26,6 +26,13 @@ export class UsersService {
     });
   }
 
+  findPublicByEmail(email: string): Promise<PublicUser | null> {
+    return this.prisma.user.findUnique({
+      where: { email: this.normalizeEmail(email) },
+      select: publicUserSelect,
+    });
+  }
+
   findAuthById(id: string): Promise<AuthUser | null> {
     return this.prisma.user.findUnique({
       where: { id },

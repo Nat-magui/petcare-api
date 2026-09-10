@@ -84,6 +84,20 @@ describe('UsersService', () => {
     expect(result).not.toHaveProperty('refreshTokenHash');
   });
 
+  it('finds by normalized email using only the public projection', async () => {
+    prisma.user.findUnique.mockResolvedValue(publicUser);
+
+    const result = await service.findPublicByEmail('MAGA@EXAMPLE.COM');
+
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { email: 'maga@example.com' },
+      select: publicUserSelect,
+    });
+    expect(result).toEqual(publicUser);
+    expect(result).not.toHaveProperty('passwordHash');
+    expect(result).not.toHaveProperty('refreshTokenHash');
+  });
+
   it('finds auth state by id using the internal auth projection', async () => {
     prisma.user.findUnique.mockResolvedValue(authUser);
 

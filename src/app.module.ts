@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { ApiExceptionFilter } from './common/errors/api-exception.filter.js';
 import { createValidationPipe } from './common/pipes/validation.pipe.js';
 import { HealthModule } from './health/health.module.js';
+import { PetAccessModule } from './pet-access/pet-access.module.js';
 import { PetsModule } from './pets/pets.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -15,6 +16,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     HealthModule,
+    PetAccessModule,
     PetsModule,
     PrismaModule,
   ],
