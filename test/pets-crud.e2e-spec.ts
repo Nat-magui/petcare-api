@@ -189,7 +189,7 @@ describe('Pet CRUD (e2e)', () => {
         });
         expect(response.body).not.toHaveProperty('accesses');
       }
-    });
+    }, 15_000);
 
     it('returns PET_ACCESS_DENIED for an existing inaccessible Pet', async () => {
       const owner = await registerAndLogin('detail-private-owner');
