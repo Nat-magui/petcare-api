@@ -11,3 +11,7 @@ export interface AuthenticatedRequest extends Request {
 export interface AccessTokenPayload {
   sub: string;
 }
+
+export interface RefreshTokenPayload {
+  sub: string;
+}

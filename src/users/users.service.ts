@@ -26,6 +26,13 @@ export class UsersService {
     });
   }
 
+  findAuthById(id: string): Promise<AuthUser | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: authUserSelect,
+    });
+  }
+
   create(data: CreateUserData): Promise<PublicUser> {
     return this.prisma.user.create({
       data: {

@@ -84,6 +84,18 @@ describe('UsersService', () => {
     expect(result).not.toHaveProperty('refreshTokenHash');
   });
 
+  it('finds auth state by id using the internal auth projection', async () => {
+    prisma.user.findUnique.mockResolvedValue(authUser);
+
+    await expect(service.findAuthById(publicUser.id)).resolves.toEqual(
+      authUser,
+    );
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: publicUser.id },
+      select: authUserSelect,
+    });
+  });
+
   it('returns null when a user is not found', async () => {
     prisma.user.findUnique.mockResolvedValue(null);
 

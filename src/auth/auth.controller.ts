@@ -8,10 +8,15 @@ import {
   Req,
 } from '@nestjs/common';
 import type { PublicUser } from '../users/users.types.js';
-import { AuthService, type LoginResponse } from './auth.service.js';
+import {
+  AuthService,
+  type LoginResponse,
+  type RefreshResponse,
+} from './auth.service.js';
 import type { AuthenticatedRequest } from './auth.types.js';
 import { Public } from './decorators/public.decorator.js';
 import { LoginDto } from './dto/login.dto.js';
+import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 
 @Controller('auth')
@@ -29,6 +34,22 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
     return this.authService.login(loginDto);
+  }
+
+  @Public()
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  refresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<RefreshResponse> {
+    return this.authService.refresh(refreshTokenDto);
+  }
+
+  @Public()
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  logout(@Body() refreshTokenDto: RefreshTokenDto): Promise<void> {
+    return this.authService.logout(refreshTokenDto);
   }
 
   @Get('me')
