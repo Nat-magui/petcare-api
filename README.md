@@ -446,12 +446,40 @@ Volvé a ejecutar la solicitud **Login** correspondiente al usuario. Una ejecuci
 - [ ] `pnpm test` pasa.
 - [ ] `pnpm test:e2e` pasa.
 
-## Despliegue
+## 🚀 Despliegue
 
-La reproducción local está documentada y `compose.yaml` proporciona únicamente PostgreSQL para desarrollo. El repositorio todavía no contiene una URL pública ni una configuración de proveedor validada, por lo que no se documenta una estrategia o endpoint de producción inventado.
+PetCare API V1 se encuentra desplegada en **Render**, utilizando un **Web Service Node.js** para la API y una instancia administrada de **PostgreSQL 17** para persistencia.
 
-El próximo paso, TASK020, desplegará un servicio de API junto con una base PostgreSQL. Cuando ese trabajo esté completo, esta sección podrá incorporar la URL base y la URL de Swagger reales, si corresponde.
+### Producción
 
-## Nota académica y licencia
+- 🌐 **API:** https://petcare-api-3i5v.onrender.com
+- 📘 **Swagger / OpenAPI:** https://petcare-api-3i5v.onrender.com/api/docs
+- ❤️ **Health check:** https://petcare-api-3i5v.onrender.com/api/v1/health
 
-PetCare API V1 es un proyecto académico de **IntegrarTEC — Integrador 4**. `package.json` lo declara privado y `UNLICENSED`; este repositorio no concede una licencia MIT ni otra licencia de distribución.
+La API y la base de datos PostgreSQL se encuentran desplegadas en la misma región de Render (**Virginia — US East**) y la aplicación se conecta a PostgreSQL mediante la red privada del proveedor.
+
+Las migraciones versionadas de Prisma fueron aplicadas en producción mediante:
+
+```bash
+pnpm exec prisma migrate deploy
+```
+
+El entorno productivo fue verificado mediante:
+
+* `GET /api/v1/health` → `200 OK`.
+* Swagger UI accesible públicamente.
+* Esquema de Prisma actualizado en PostgreSQL.
+* Collection Runner de Postman ejecutado contra producción → **85/85 tests passing**.
+- Persistencia verificada después de reiniciar el Web Service de Render.
+
+> **Nota sobre Render Free:** el Web Service puede entrar en suspensión después de un período de inactividad. La primera solicitud puede demorar mientras el servicio vuelve a iniciarse.
+
+> La base PostgreSQL utilizada para esta entrega corresponde al plan gratuito de Render y tiene una duración limitada. Está destinada a la demostración académica del proyecto.
+
+## 🎓 Nota académica y licencia
+
+PetCare API V1 es un proyecto académico de **IntegrarTEC — Integrador 4**.
+
+**Autora:** Magalí Aldana Suárez
+
+`package.json` declara el proyecto como `private` y `UNLICENSED`; este repositorio no concede una licencia MIT ni otra licencia de distribución.
