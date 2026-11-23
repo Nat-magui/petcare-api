@@ -12,13 +12,17 @@ Backend del proyecto académico **IntegrarTEC — Integrador 4**. Este repositor
 ![Prisma 7](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)
 ![pnpm](https://img.shields.io/badge/pnpm-package_manager-F69220?logo=pnpm&logoColor=white)
 
+[![CI](https://github.com/Nat-magui/petcare-api/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Nat-magui/petcare-api/actions/workflows/ci.yml)
+
 ![Unit tests](https://img.shields.io/badge/unit-80%20passing-2EA44F?logo=vitest&logoColor=white)
 ![E2E tests](https://img.shields.io/badge/e2e-177%20passing-2EA44F?logo=vitest&logoColor=white)
 ![Postman snapshot](https://img.shields.io/badge/Postman-85%2F85%20passing-FF6C37?logo=postman&logoColor=white)
 
 </div>
 
-> Los badges de pruebas representan la instantánea local verificada del proyecto, no métricas de integración continua.
+[Swagger en Render](https://petcare-api-3i5v.onrender.com/api/docs) · [Arranque local](#-reproducir-petcare-localmente) · [Demo con Postman](#-reproducir-el-flujo-completo-con-postman)
+
+> El badge de CI muestra el estado de GitHub Actions en `main`. Los conteos de unitarias, E2E y Postman corresponden a la instantánea local verificada.
 
 ## Navegación
 
@@ -125,6 +129,21 @@ Los roles son específicos para cada mascota: un mismo usuario puede ser `OWNER`
 Toda mascota existente debe conservar al menos un `OWNER`. Quitar o degradar al último `OWNER` produce `409 PET_LAST_OWNER`; todos los `OWNER` tienen la misma autoridad y no existe `PRIMARY_OWNER` en V1.
 
 Las reglas y códigos controlados se detallan en el [Documento 02 — Diccionario de Errores y Reglas de Negocio](docs/02_Diccionario_Errores_Reglas_Negocio_PetCare_v1_1.pdf).
+
+### Ejemplo de acceso compartido
+
+En Swagger, registrá dos cuentas de prueba. Usá `cuidadora@example.com` para la segunda, o elegí otro correo disponible y usá ese mismo en el ejemplo. Iniciá sesión con la primera cuenta, cargá su access token en **Authorize** y creá una mascota con `POST /api/v1/pets`. Guardá el ID devuelto como `petId`.
+
+Con el token de la primera cuenta (`OWNER`), ejecutá `POST /api/v1/pets/{petId}/access` con este cuerpo:
+
+~~~json
+{
+  "email": "cuidadora@example.com",
+  "role": "CAREGIVER"
+}
+~~~
+
+La respuesta esperada es `201 Created`. Iniciá sesión con la segunda cuenta, reemplazá el token en **Authorize** y ejecutá `PATCH /api/v1/pets/{petId}` con `{"name":"Luna"}`. La respuesta esperada es `200 OK`.
 
 ## Requisitos previos
 
@@ -317,7 +336,7 @@ pnpm test:e2e
 pnpm test:cov
 ```
 
-El proyecto no declara cobertura del 100 % ni publica métricas de CI.
+[GitHub Actions](https://github.com/Nat-magui/petcare-api/actions/workflows/ci.yml) ejecuta lint, build, unitarias y E2E con PostgreSQL 17 en pull requests hacia `main` y pushes a `main`.
 
 ## Contrato de errores
 
