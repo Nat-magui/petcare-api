@@ -27,3 +27,39 @@ jobs:
       - run: pnpm lint
       - run: pnpm build
       - run: pnpm test
+
+  e2e:
+    name: E2E with PostgreSQL
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/petcare_e2e?schema=public
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: petcare_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d petcare_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - uses: pnpm/action-setup@v6
+      - name: Prepare test environment
+        run: cp .env.example .env
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma migrate deploy
+      - run: pnpm test:e2e
+        env:
+          # Fixtures create many users from one IP. Security tests set their own limits.
+          AUTH_THROTTLE_LIMIT: '1000'
+          THROTTLE_LIMIT: '1000'
