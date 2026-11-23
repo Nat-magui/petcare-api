@@ -62,14 +62,14 @@ La V1 no incluye frontend, pagos, integraciones externas, invitaciones, recomend
 |---|---:|---|
 | NestJS | 11 | Estructura modular, controladores, servicios, guards, pipes y filtros HTTP. |
 | TypeScript | 6 | Tipado estático y compilación del backend ESM. |
-| Node.js | No fijada por el repositorio | Runtime compatible con NestJS 11; el proyecto no impone una versión exacta. |
+| Node.js | `24.22.3` (`.nvmrc`) | Runtime utilizado por CI. |
 | PostgreSQL | 17 | Persistencia relacional local provista por Docker Compose. |
 | Prisma | 7.10.0 | Esquema, migraciones y acceso tipado a PostgreSQL. |
 | JWT + bcrypt | JWT / bcrypt 6.0.0 | Tokens de acceso y refresh; hashing de contraseñas y refresh tokens. |
 | Swagger / OpenAPI | `@nestjs/swagger` 11.4.7 | Contrato HTTP explorable y prueba manual de endpoints. |
 | Vitest | 4 | Pruebas unitarias, E2E y cobertura. |
 | Postman | Colección v2.1 | Demostración y verificación reproducible de flujos completos. |
-| pnpm | No fijada por el repositorio | Instalación de dependencias y ejecución de scripts. |
+| pnpm | `11.25.0` (`packageManager`) | Instalación de dependencias y ejecución de scripts. |
 
 ## Arquitectura y dominio
 
@@ -129,8 +129,8 @@ Las reglas y códigos controlados se detallan en el [Documento 02 — Diccionari
 ## Requisitos previos
 
 - Git.
-- Node.js compatible con NestJS 11. El repositorio no fija una versión exacta de Node.js.
-- pnpm.
+- Node.js `24.22.3`, indicado en `.nvmrc`.
+- pnpm `11.25.0`, indicado en `package.json`.
 - Docker Desktop, o Docker Engine con Docker Compose.
 
 No es necesario instalar PostgreSQL de forma nativa: `compose.yaml` proporciona la instancia local.
